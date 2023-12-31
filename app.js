@@ -2,7 +2,7 @@ class Tree {
   constructor(array) {
     this.root = this.buildTree(array, 0, array.length - 1);
   }
-  buildTree(array, start, end) {
+  buildTree(array, start = 0, end = array.length - 1) {
     if (start > end) {
       return null;
     }
@@ -74,7 +74,6 @@ class Tree {
   levelOrderIter(callback) {
     if (!this.root) return [];
     const array = [this.root];
-    console.log(array);
     const result = [];
     while (array.length) {
       const node = array.shift();
@@ -93,6 +92,74 @@ class Tree {
     if (!callback) {
       return result;
     }
+  }
+  inorder(node = this.root, callback, result = []) {
+    if (!this.root) return [];
+    if (node === null) return;
+    this.inorder(node.left, callback, result);
+    callback ? callback(node) : result.push(node.data);
+    this.inorder(node.right, callback, result);
+    if (result) return result;
+  }
+  preorder(callback) {
+    if (!this.root) return [];
+    const stack = [this.root];
+    const results = [];
+    while (stack.length) {
+      const node = stack.pop();
+      if (node.right) stack.push(node.right);
+      if (node.left) stack.push(node.left);
+      if (callback) callback(node);
+      console.log(callback(node));
+      results.push(node.data);
+    }
+    if (!callback) return results;
+  }
+  postorder(callback) {
+    if (!this.root) return [];
+    const stack = [this.root];
+    const results = [];
+    while (stack.length) {
+      const node = stack.pop();
+      if (node.left) stack.push(node.left);
+      if (node.right) stack.push(node.right);
+      if (callback) callback(node);
+      results.push(node.data);
+    }
+    if (!callback) return results.reverse();
+  }
+  height(node = this.root) {
+    if (node === null) return -1;
+    const leftHeight = this.height(node.left);
+    const rightHeight = this.height(node.right);
+    return Math.max(leftHeight, rightHeight) + 1;
+  }
+  depth(node = this.root, depth = 0) {
+    if (node === this.root) {
+      return 0;
+    }
+    if (node.data > this.root.data) {
+      return this.depth(node.right, depth + 1);
+    }
+    if (node.data < this.root.data) {
+      return this.depth(node.left, depth + 1);
+    }
+    if (node.data === this.root.data) {
+      return depth;
+    }
+  }
+  isBalanced(node = this.root) {
+    if (node === null) {
+      return true;
+    }
+    if (Math.abs(this.height(node.left) - this.height(node.right)) > 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  rebalance() {
+    return this.buildTree(this.inorder());
   }
 }
 
@@ -123,3 +190,6 @@ prettyPrint(newTree.root);
 console.log(newTree);
 prettyPrint(newTree.root);
 console.log(newTree.levelOrderIter());
+console.log(newTree.isBalanced());
+console.log(newTree.inorder());
+prettyPrint(newTree.rebalance());
